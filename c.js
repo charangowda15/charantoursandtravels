@@ -162,7 +162,21 @@ function generateReceipt(data) {
 //     doc.text("UPI ID: charantours@upi", 20, 135);
 //   }
 
-  doc.text("TOTAL: Rs. " + data.total, 20, 150);
+  // doc.text("TOTAL: Rs. " + data.total, 20, 150);
+//   doc.text("TOTAL: Rs. " + data.total, 20, 150);
+
+// // Note after total
+// doc.setFont("helvetica", "italic");
+// doc.text("Note: ", 20, 165);/
+doc.text("TOTAL: Rs. " + data.total, 20, 150);
+
+doc.setFont("helvetica", "italic");
+doc.text(
+  "Note: This receipt is for reference only. Booking approval or rejection will be communicated via WhatsApp.",
+  20,
+  165
+);
+  
 
   doc.save("Receipt_" + data.bookingId + ".pdf");
 }
