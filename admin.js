@@ -113,7 +113,7 @@ async function loadBookings() {
   });
 
   document.getElementById("totalBookings").innerText = total;
-  document.getElementById("pendingBookings").innerText = pending;
+  // document.getElementById("pendingBookings").innerText = pending;
   document.getElementById("approvedBookings").innerText = approved;
   document.getElementById("rejectedBookings").innerText = rejected;
 }
@@ -171,12 +171,89 @@ async function loadUsers() {
     `;
   });
 }
+function openWhatsApp(data, status) {
+
+  let message = "";
+
+  if(status === "Approved"){
+
+    message = `🎉 CHARAN TOURS
+
+Booking Status: APPROVED ✅
+
+Booking ID: ${data.bookingId || ""}
+
+Name: ${data.name || ""}
+Place: ${data.place || ""}
+Amount: ₹${data.total || 0}
+
+Your booking has been confirmed.
+
+Thank you for choosing Charan Tours.`;
+
+  } else if(status === "Rejected"){
+
+    message = `❌ CHARAN TOURS
+
+Booking Status: REJECTED
+
+Booking ID: ${data.bookingId || ""}
+
+Name: ${data.name || ""}
+Place: ${data.place || ""}
+
+Unfortunately your booking could not be approved.
+
+Please contact support for details.`;
+
+  } else {
+
+    message = `⏳ CHARAN TOURS
+
+Booking Status: PENDING
+
+Booking ID: ${data.bookingId || ""}
+
+Your booking is under review.
+
+We will update you shortly.`;
+
+  }
+
+  window.open(
+    `https://wa.me/91${data.phone}?text=${encodeURIComponent(message)}`,
+    "_blank"
+  );
+}
 
 /* =========================
    APPROVE BOOKING
 ========================= */
 
+// window.approveBooking = async function(id){
+
+//   await updateDoc(
+//     doc(db,"bookings",id),
+//     {
+//       status:"Approved"
+//     }
+//   );
+
+//   loadBookings();
+// };
 window.approveBooking = async function(id){
+
+  const snapshot = await getDocs(
+    query(collection(db,"bookings"))
+  );
+
+  let bookingData = null;
+
+  snapshot.forEach(docSnap => {
+    if(docSnap.id === id){
+      bookingData = docSnap.data();
+    }
+  });
 
   await updateDoc(
     doc(db,"bookings",id),
@@ -185,6 +262,10 @@ window.approveBooking = async function(id){
     }
   );
 
+  if(bookingData){
+    openWhatsApp(bookingData,"Approved");
+  }
+
   loadBookings();
 };
 
@@ -192,7 +273,30 @@ window.approveBooking = async function(id){
    REJECT BOOKING
 ========================= */
 
+// window.rejectBooking = async function(id){
+
+//   await updateDoc(
+//     doc(db,"bookings",id),
+//     {
+//       status:"Rejected"
+//     }
+//   );
+
+//   loadBookings();
+// };
 window.rejectBooking = async function(id){
+
+  const snapshot = await getDocs(
+    query(collection(db,"bookings"))
+  );
+
+  let bookingData = null;
+
+  snapshot.forEach(docSnap => {
+    if(docSnap.id === id){
+      bookingData = docSnap.data();
+    }
+  });
 
   await updateDoc(
     doc(db,"bookings",id),
@@ -200,6 +304,10 @@ window.rejectBooking = async function(id){
       status:"Rejected"
     }
   );
+
+  if(bookingData){
+    openWhatsApp(bookingData,"Rejected");
+  }
 
   loadBookings();
 };
